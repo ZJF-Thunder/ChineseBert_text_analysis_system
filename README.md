@@ -1,3 +1,7 @@
+项目名称：
+ChineseBert_text_analysis_system
+ZJF-Thunder/ChineseBert_text_analysis_system
+
 大致使用说明：
 
 1.系统运行必要文件：
