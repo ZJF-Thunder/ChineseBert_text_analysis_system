@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Background</title>
+        <script src="../my_js/jquery.min.js"></script>
+    <script src="../my_js/boostrap.js"></script>
+    <style>
+        /*渐变方式一*/
+        body {
+            background: linear-gradient(to right, #00c3ff, #ffff1c);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+<!--            background-color: #f0f0f0;-->
+<!--            background-image: linear-gradient(to right, #f0f0f0, #ffffff);-->
+        }
+        /*渐变方式二*/
+        #gradient-bg {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background-image: linear-gradient(to right, #00c3ff, #ffff1c);
+        }
+
+    </style>
+</head>
+<body>
+<!--    <div id="gradient-container"></div>-->
+    <div id="gradient-bg"></div>
+<!--    渐变方式一-->
+    <script>
+        var container = document.body;
+        // var container = document.getElementById("gradient-container");
+        var alpha = 0;
+        var increaseAlpha = true;
+
+        function animate() {
+          alpha += increaseAlpha ? 0.005 : -0.005;
+          if (alpha >= 1) {
+            alpha = 1;
+            increaseAlpha = false;
+          } else if (alpha <= 0) {
+            alpha = 0;
+            increaseAlpha = true;
+          }
+
+          container.style.background = `linear-gradient(to right, rgba(0, 195, 255, ${alpha}), rgba(255, 255, 28, ${alpha}))`;
+
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+<!--    渐变方式二-->
+    <script>
+        $(document).ready(function() {
+          var alpha = 0;
+          var increaseAlpha = true;
+
+          function animateBackground() {
+            alpha += increaseAlpha ? 0.005 : -0.005;
+            if (alpha >= 1) {
+              alpha = 1;
+              increaseAlpha = false;
+            } else if (alpha <= 0) {
+              alpha = 0;
+              increaseAlpha = true;
+            }
+
+            var rgbaColor1 = "rgba(0, 195, 255, " + alpha + ")";
+            var rgbaColor2 = "rgba(255, 255, 28, " + alpha + ")";
+
+            $("#gradient-bg").css("background-image", "linear-gradient(to right, " + rgbaColor1 + ", " + rgbaColor2 + ")");
+
+            requestAnimationFrame(animateBackground);
+          }
+
+          animateBackground();
+        });
+    </script>
+
+<!--    <script src="../my_js/dynamic-bg.js"></script>-->
+</body>
+</html>

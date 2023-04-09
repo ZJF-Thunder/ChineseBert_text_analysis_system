@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>文本分析系统</title>
+    <link rel="stylesheet" href="../my_js/bootstrap.css">
+    <script src="../my_js/jquery.min.js"></script>
+    <script src="../my_js/boostrap.js"></script>
+    <style>
+        body{
+            background:url("../my_js/bg5.gif") no-repeat;
+            background-size:100% 100%;
+            height:900px;
+        }
+        video,img{
+            border:5px outset orange;
+        }
+        h1{
+            color: lightsalmon;
+            font-family:"华文琥珀";
+            font-size:80px;
+            text-align:center;
+        }
+        h3{
+            color:blue;
+            font-family:"华文琥珀"
+        }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+            padding: 10px;
+            font-size: 16px;
+            color: #ffffff;
+            border: 5px solid #c4c2c2;
+            border-radius: 5px;
+            background-color: transparent; /* 将背景设置为透明 */
+        }
+        /* 设置 placeholder 文本的字体大小和颜色 */
+        textarea::placeholder {
+            font-size: 14px; /* 设置字体大小 */
+            color: #d4d3d3; /* 设置字体颜色 */
+        }
+        button {
+            width: 100px;
+            height: 40px;
+            background-color: #007bff;
+            color: #fff;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-success {
+            background-color: green;
+            color: white;
+        }
+        button:hover {
+            background-color: #0069d9;
+        }
+        #result {
+            border: 2px solid #f3b802; /* 边框宽度、样式、颜色 */
+            padding: 25px; /* 内边距 */
+            color: #ef8402;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+<br/>
+<div><h1>文本分析系统</h1></div>
+<br/>
+<div class="row vh-100" style="display: flex; justify-content: center;">
+    <div class="col-sm-2"></div>
+    <div class="col-sm-8 d-flex justify-content-center flex-column align-items-center">
+        <form>
+            <textarea name="text" id="input-text" placeholder="请输入待分析的文本"></textarea>
+        </form>
+    </div>
+    <div class="col-sm-2"></div>
+</div>
+<div class="row">
+    <div class="col-sm-5"></div>
+    <div class="col-sm-2 text-center">
+        <button id="predict-button" class="btn btn-success btn-lg">分析</button>
+    </div>
+    <div class="col-sm-5"></div>
+</div>
+<br>
+<div class="row">
+    <div class="col-sm-3"></div>
+    <div class="col-sm-6 text-center" id="result" ></div>
+    <div class="col-sm-3"></div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#predict-button').click(function() {
+            //获取文本框的值
+            // const inputText = $('#input-text').val();
+            const inputText = document.getElementById("input-text").value;
+            $.ajax({
+                type: 'POST',
+                url: '/predict',
+                data: {'text': inputText},
+                success: function(response) {
+                    // $('#result').text('预测结果：' + response['label']);
+                    $('#result').text(response['result']);
+                    // $('result').massage()
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+            $.post('/predict', {'text': inputText}, function(response) {
+                $('#result').text(response['result']);
+            });
+            // $.post("/predict", {'text': inputText}, function(response) {
+            //     // 请求成功的回调函数
+            //     if (response.status === 'success') {
+            //         // 处理成功的情况
+            //         $('#result').text(response['result']);
+            //     } else {
+            //         // 处理失败的情况
+            //     }
+            // }).fail(function(error) {
+            //     // 请求失败的回调函数
+            //     console.log(error);
+            // });
+            // $.post('/predict', {'text': inputText}, function(response) {
+            //     // 请求成功时的回调函数
+            //     $('#result').text(response['result']);
+            // }).fail(function(error) {
+            //     // 请求失败时的回调函数
+            //     console.log(error);
+            //     // 其他错误处理
+            // });
+
+        });
+    });
+    function predict() {
+        const inputText = $('#input-text').val();
+        $.ajax({
+            type: 'POST',
+            url: '/predict',
+            data: {'text': inputText},
+            success: function(response) {
+                $('#result').text(response['result']);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+    }
+
+    $('#predict-button').click(predict);
+
+
+</script>
+</body>
+</html>

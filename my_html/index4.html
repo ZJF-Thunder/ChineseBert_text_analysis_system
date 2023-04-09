@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>文本分类器</title>
+	<meta charset="UTF-8">
+</head>
+<body>
+	<h1>文本分类器</h1>
+	<p>请输入待分类文本：</p>
+	<textarea id="input-text" rows="4" cols="50"></textarea>
+	<br><br>
+	<button onclick="classify()">预测</button>
+	<br><br>
+	<p id="result"></p>
+	<script>
+		function classify() {
+			var input = document.getElementById("input-text").value;
+			var xhr = new XMLHttpRequest();
+			xhr.open("POST", "/predict");
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.onload = function() {
+				if (xhr.status === 200) {
+					document.getElementById("result").innerHTML = xhr.responseText;
+				}
+			};
+			var data = JSON.stringify({"text": input});
+			xhr.send(data);
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module Text_Classification</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>Text_Classification</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:f%3A%5Cworkspace%5C%E6%AF%95%E4%B8%9A%E8%AE%BE%E8%AE%A1%E5%92%8C%E6%AF%95%E4%B8%9A%E8%AE%BA%E6%96%87%5C%E6%AF%95%E8%AE%BE%5Ctext_classification.py">f:\workspace\毕业设计和毕业论文\毕设\text_classification.py</a></font></td></tr></table>
+    <p><tt>功能：加载微博谣言数据集，微调预训练模型并以此进行判断是否为谣言</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#aa55cc">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Modules</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#aa55cc"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><table width="100%" summary="list"><tr><td width="25%" valign=top><a href="datetime.html">datetime</a><br>
+<a href="jieba.html">jieba</a><br>
+<a href="json.html">json</a><br>
+</td><td width="25%" valign=top><a href="logging.html">logging</a><br>
+<a href="os.html">os</a><br>
+<a href="matplotlib.pyplot.html">matplotlib.pyplot</a><br>
+</td><td width="25%" valign=top><a href="random.html">random</a><br>
+<a href="time.html">time</a><br>
+<a href="torch.html">torch</a><br>
+</td><td width="25%" valign=top><a href="zipfile.html">zipfile</a><br>
+</td></tr></table></td></tr></table><p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#eeaa77">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Functions</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#eeaa77"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl><dt><a name="-Text_predict"><strong>Text_predict</strong></a>(trained_model, tokenizer)</dt><dd><tt>功能：调用预测模型来预测文本类别，展示结果<br>
+&nbsp;<br>
+:param&nbsp;trained_model:&nbsp;训练好的模型<br>
+:param&nbsp;tokenizer:&nbsp;预训练模型的分词器<br>
+:return:&nbsp;无</tt></dd></dl>
+ <dl><dt><a name="-compute_metrics"><strong>compute_metrics</strong></a>(y_true, y_pred)</dt><dd><tt>功能：定义计算模型性能指标函数<br>
+&nbsp;<br>
+:param&nbsp;y_true:&nbsp;真实的标签列表<br>
+:param&nbsp;y_pred:&nbsp;预测的标签列表<br>
+:return:返回各项计算结果</tt></dd></dl>
+ <dl><dt><a name="-create_data_list"><strong>create_data_list</strong></a>(data_list_path)</dt><dd><tt>:param&nbsp;data_list_path:&nbsp;样本数字化文本的指定生成路径<br>
+:return:&nbsp;谣言和非谣言的数字化文本&nbsp;&nbsp;文本向量化</tt></dd></dl>
+ <dl><dt><a name="-create_dict"><strong>create_dict</strong></a>(data_path, dict_path)</dt><dd><tt>:param&nbsp;data_path:&nbsp;样本数据路径<br>
+:param&nbsp;dict_path:&nbsp;生成字典路径<br>
+:return:&nbsp;None</tt></dd></dl>
+ <dl><dt><a name="-cuda_is_available"><strong>cuda_is_available</strong></a>()</dt><dd><tt>功能：检查GPU是否可用，不可用则退出程序</tt></dd></dl>
+ <dl><dt><a name="-data_preprocessing"><strong>data_preprocessing</strong></a>(src_path, target_path)</dt><dd><tt>功能：<br>
+解压原始数据集，将Rumor_Dataset.zip解压至data目录下，<br>
+并解析出谣言和非谣言数据，并将所有数据写入all_data.txt<br>
+&nbsp;<br>
+:param&nbsp;src_path:&nbsp;需要解压的文件的路径<br>
+:param&nbsp;target_path:&nbsp;解压之后的文件存放路径<br>
+:return:&nbsp;所有数据写入all_data.txt</tt></dd></dl>
+ <dl><dt><a name="-get_dict_len"><strong>get_dict_len</strong></a>(dict_path)</dt><dd><tt>:param&nbsp;dict_path:&nbsp;字典的路径<br>
+:return:&nbsp;字典长度</tt></dd></dl>
+ <dl><dt><a name="-get_rumor_norumor_num"><strong>get_rumor_norumor_num</strong></a>(data_path)</dt><dd><tt>功能：<br>
+获取谣言和非谣言的数据条数<br>
+&nbsp;<br>
+:param&nbsp;data_path:&nbsp;扩充后的数据集地址<br>
+:return:&nbsp;无</tt></dd></dl>
+ <dl><dt><a name="-log_config"><strong>log_config</strong></a>()</dt><dd><tt>功能：配置日志</tt></dd></dl>
+ <dl><dt><a name="-main"><strong>main</strong></a>()</dt><dd><tt>#&nbsp;主函数入口</tt></dd></dl>
+ <dl><dt><a name="-model_eval"><strong>model_eval</strong></a>(model, test_tensor)</dt><dd><tt>功能：测试训练好的模型的性能<br>
+&nbsp;<br>
+:param&nbsp;model:&nbsp;训练(微调)好的模型<br>
+:param&nbsp;test_tensor:&nbsp;输入的测试数据，数据类型为tensor<br>
+:return:&nbsp;无</tt></dd></dl>
+ <dl><dt><a name="-model_train"><strong>model_train</strong></a>(model, train_tensor)</dt><dd><tt>功能：<br>
+输入训练数据，训练(微调)模型<br>
+&nbsp;<br>
+:param&nbsp;model:&nbsp;定义的预训练模型<br>
+:param&nbsp;train_tensor:&nbsp;输入的训练数据，数据类型为tensor<br>
+:return:&nbsp;训练(微调)好的模型</tt></dd></dl>
+ <dl><dt><a name="-one_hot_encoding"><strong>one_hot_encoding</strong></a>(label_ids, num_labels)</dt><dd><tt>功能：对标签进行独热编码<br>
+&nbsp;<br>
+:param&nbsp;label_ids:&nbsp;标签，一般是个list或者tensor<br>
+:param&nbsp;num_labels:&nbsp;标签数量<br>
+:return:&nbsp;独热编码之后的标签</tt></dd></dl>
+ <dl><dt><a name="-predicted"><strong>predicted</strong></a>(text, model, tokenizer)</dt><dd><tt>功能：输入一条文本，调用模型，返回预测结果<br>
+&nbsp;<br>
+:param&nbsp;text:&nbsp;输入的文本，类型为str<br>
+:param&nbsp;model:&nbsp;训练好的模型<br>
+:param&nbsp;tokenizer:&nbsp;预训练模型的分词器<br>
+:return:&nbsp;返回预测的标签和概率</tt></dd></dl>
+ <dl><dt><a name="-read_data"><strong>read_data</strong></a>(filename, tokenizer, max_seq_length=256)</dt><dd><tt>功能：<br>
+读取数据并将其转换为模型所需的格式<br>
+&nbsp;<br>
+:param&nbsp;filename:&nbsp;需要转换的数据的路径<br>
+:param&nbsp;tokenizer:&nbsp;模型的分词器<br>
+:param&nbsp;max_seq_length:&nbsp;最长文本长度，大于则截断，小于则填充<br>
+:return:&nbsp;转换成模型所需格式的数据</tt></dd></dl>
+ <dl><dt><a name="-show_animation"><strong>show_animation</strong></a>(train_losses)</dt><dd><tt>功能：展示训练损失的动态过程图<br>
+&nbsp;<br>
+:param&nbsp;train_losses:&nbsp;训练的总损失<br>
+:return:&nbsp;无</tt></dd></dl>
+ <dl><dt><a name="-splitting_dataset"><strong>splitting_dataset</strong></a>(data_path, train_size=0.9)</dt><dd><tt>功能：<br>
+按照特定比例划分数据集，默认比例为9：1<br>
+&nbsp;<br>
+:param&nbsp;data_path:&nbsp;需要划分的数据的地址<br>
+:param&nbsp;train_size:&nbsp;训练集的占比大小，默认为0.9<br>
+:return:&nbsp;训练集和测试集的数据地址<br>
+train_data_path&nbsp;=&nbsp;'./data/train_data.txt'<br>
+test_data_path&nbsp;=&nbsp;'./data/test_data.txt'</tt></dd></dl>
+</td></tr></table>
+</body></html>

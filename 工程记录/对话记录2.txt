@@ -1,0 +1,58 @@
+这段代码实际上是调用了预先训练好的bert-base-chinese模型，其默认使用的激活函数是gelu，即高斯误差线性单元激活函数。gelu函数是BERT中广泛使用的默认激活函数之一，其数学表达式为：
+
+gelu(x) = 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
+
+如果您想更改默认激活函数，可以在加载BertForSequenceClassification时，通过指定不同的参数来替换默认的激活函数。
+
+
+
+# 训练模型
+def model_train(model, train_tensor):
+    # 将数据加载到模型中进行微调
+    optimizer = torch.optim.Adam(model.parameters(), lr=Learning_rate)
+    criterion = torch.nn.BCEWithLogitsLoss()
+    train_tensor_stack = [torch.stack(tensors) for tensors in zip(*train_tensor)]
+    train_dataset = TensorDataset(*train_tensor_stack)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=Batch_size, drop_last=True)
+
+    # 将模型移动到GPU设备
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
+    model.train()
+    start_time = time.time()
+    for epoch in range(Epochs):
+        epoch_loss = 0
+        for i, (input_ids, token_type_ids, attention_mask, labels) in enumerate(train_loader):
+            # 正向传播
+            input_ids = input_ids.squeeze(1).to(device)
+            token_type_ids = token_type_ids.squeeze(1).to(device)
+            attention_mask = attention_mask.squeeze(1).to(device)
+            labels = labels.to(device)
+            optimizer.zero_grad()
+            outputs = model(input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask, labels=labels)
+            loss = outputs.loss
+            loss.backward()
+            optimizer.step()
+            epoch_loss += loss.item()
+            if (i + 1) % 10 == 0:
+                print(f"Epoch [{epoch + 1}/{Epochs}], Batch [{i + 1}/{len(train_loader)}], Loss: {loss.item():.4f}")
+        avg_epoch_loss = epoch_loss / len(train_loader)
+        print(f"Epoch [{epoch + 1}/{Epochs}], Loss: {avg_epoch_loss:.4f}")
+    end_time = time.time()
+    total_time = end_time - start_time
+    print("训练开始时间：", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(start_time)))
+    print("训练结束时间：", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(end_time)))
+    print(f"模型训练总时间为: {total_time:.2f} 秒")
+    return model
+
+改进的地方有：
+
+在循环中使用 enumerate 函数获取当前迭代的索引和元素，使得代码更加简洁易懂。
+
+使用 to 方法将张量移动到 GPU 设备，这样可以提高模型训练的速度。
+
+使用 squeeze 方法去掉张量的第一维，而不是将所有维度都压缩成一维，这样可以保留张量的形状信息。
+
+在每个 epoch 完成后，计算当前 epoch 的平均损失，并输出到屏幕上，便于用户查看模型的训练进度。
+
+这些改进可以使代码更加高效、简洁、易读，提高代码的可维护性和可扩展性。

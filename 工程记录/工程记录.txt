@@ -1,0 +1,1066 @@
+工程记录：
+ChineseBert_text_analysis_system
+1.https://huggingface.co/hfl/chinese-bert-wwm-ext  下载预训练模型，准备做一个分类小任务
+2.基于chinese-bert-wwm-ex预训练模型，对chinese-bert-wwm-ext进行微调
+努力方向，就是用自己的数据集，来微调预训练模型
+按照飞桨上面的相关案例代码，搭建自己的pytorch版本的程序
+ppnlp.datasets.ChnSentiCorp.get_datasets(['train','dev','test'])加载数据集
+遇到难题：怎么处理这个微博谣言数据集
+了解了自然语言处理方面的基本流程，通过样本生成字典，然后将每个字符转换成字典中每个字符对应的数字，然后再输入到模型中进行训练。
+先把代码整体跑通，然后开始调整参数
+十点之前把代码重新格式化
+用djigo写一个界面
+if __name__ == '__main__':怎么解释
+    Learning_rate = 2e-5
+
+模型训练，eval和test有什么区别
+list:2963 ,里面是一个包含了4个元素的元组，四个元素中，有三个是张量，还有一个是整数
+tensor([[  101,  8238,  8148,   117,  8183,  8156,   117, 10332,  8160,   117,
+          8787,  8157,   117, 11003,  8161,   117, 11003,  8161,   117, 11003,
+          8161,   102,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+             0,     0,     0,     0,     0,     0,     0,     0]])
+
+tensor([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0]])
+
+tensor([[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+         0, 0, 0, 0, 0, 0, 0, 0]])
+
+（int）0
+
+
+在使用transformers库中的tokenizer进行编码时，通过encode_plus()函数可以将文本编码为包含input_ids、token_type_ids和attention_mask三个部分的张量。其中：
+
+input_ids：是将文本转化为token后，对应的token id列表，长度为max_length。
+token_type_ids：是针对BERT等模型设计的，在输入序列中进行区分不同句子的标记。一般是将第一个句子中的token标记为0，第二个句子中的token标记为1，其余的token则标记为padding token。如果输入只有一个句子，则所有token都标记为0。长度为max_length。
+attention_mask：用来标记哪些token是padding token，哪些是有效token。其中0表示该token是padding token，1表示是有效token。长度为max_length。
+
+这三个部分是模型输入时必须的，因此在读取数据并进行编码后，需要将这三个部分一起作为模型的输入。
+
+
+encode_plus()函数的作用是对文本进行编码和token化，并返回包含三个部分的字典类型：input_ids、token_type_ids、attention_mask。
+
+其中，input_ids表示将文本转换为token序列后对应的token id序列。token_type_ids用于区分不同文本序列的token，比如BERT中用于区分文本对的输入序列A和B。attention_mask表示对于padding位置，其值为0，否则为1。
+
+在执行encode_plus()时，模型会自动根据预训练模型中的tokenizer规则进行编码和token化，并输出上述三个参数。在此过程中，需要注意的是，模型输入的文本需要先进行预处理，例如去除无用的符号、转换大小写等。
+
+
+
+明确重复造轮子的地方，然后考虑是否需要留下来：
+1.
+read_data函数里面的encode_plus()其实既可以接收字符text也可以接收向量化之后的text，，函数里面可以自动创建对应的字典，然后将字符文本给向量化，所以其实不需要前面的处理字典和划分数据集的函数，划分数据集
+解释： tokenizer.encode_plus() 函数内部实现了将文本转换为数字的过程，它会自动处理输入的文本，所以你可以直接输入字符文本或者向量化后的数字文本，它都会正确地返回相应的token IDs、token类型IDs、attention masks等信息。不过建议还是在模型输入之前，先将文本进行向量化处理，以避免在模型输入过程中出现错误。
+如果你的输入已经是数字文本，则不需要再进行文本到数字的转换，直接将数字文本输入到模型中即可。encode_plus()函数的作用就是将输入的文本转换为模型可以接受的数字表示，并将其包装成模型所需的格式（包括token IDs、token类型IDs、attention masks等）。如果你的输入已经是数字文本，则encode_plus()函数不需要再进行文本到数字的转换，直接将数字文本输入到函数中即可。
+可以将这个过程理解为将文本转化为数字，从而方便模型进行处理和训练。在内部，encode_plus()函数也是通过创建一个字典，将每个字符映射为对应的数字，然后再将输入的文本转化为数字。
+
+
+问：那我在前面自己构建一个函数，来构建字典，然后数字化，是不是意味着我做的功能是多余的
+答：不完全是多余的，因为在构建字典和数字化文本的过程中，你可以自定义字典的大小、填充字符和截断字符的处理方式等，以及在数字化文本时可以根据自己的需求设置最大长度、是否进行截断等。这些可以根据具体的任务和数据集的特点来进行定制化处理，从而获得更好的性能。而使用预训练模型中的tokenizer虽然便捷，但是可能不太灵活，需要根据具体情况来判断是否适合使用。
+问：是不是意味着我刚才在重复造轮子
+答：是的，你刚才构建的函数和 encode_plus() 函数的功能重复了。 encode_plus() 函数在内部已经实现了将文本转换成数字的过程，因此你不需要再手动编写这个过程。
+
+
+2.
+问：
+为什么这个函数里面，outputs = model(input_ids, labels=batch['label'])这里的model只接受了input_ids这一个参数，但是不是一般需要接收input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask这三个参数吗
+答：
+在BertForSequenceClassification中，它内置了Bert模型，并且在forward()函数中定义了输入的参数。具体来说，它接收的参数包括input_ids、attention_mask和labels。其中，input_ids是输入的文本id序列，attention_mask是注意力掩码，用于指示哪些token是padding，labels是分类的标签。
+
+在训练过程中，传入的参数batch是一个由文本和对应标签构成的字典，其中的文本需要经过tokenizer编码，转换成input_ids和attention_mask才能作为模型的输入。因此，在训练过程中，只需要将input_ids和labels传入模型即可。模型内部会根据预定义的forward函数自动进行token_type_ids和attention_mask的处理。
+
+
+问：
+他这个加载的是bert-base-chinese这个预训练模型，并且是用来进行12类的文本分类，那我这个代码里面是用的chinese-bert-wwm-ext这个预训练模型，是否也可以像他一样，model那个函数只将input_ids和labels传入模型
+答：
+是的，可以像这个代码一样，在调用model时只传递input_ids和labels参数，因为BertForSequenceClassification类已经对这些预处理过程进行了封装，不需要手动传递token_type_ids和attention_mask参数。但是需要注意的是，如果使用的预训练模型是基于RoBERTa的，可能需要传递额外的attention_mask参数。
+
+问：
+那我自己指定的token_type_ids和attention_mask参数和他函数内部自己生成的token_type_ids和attention_mask参数有什么不一样
+答：
+在 BERT 中，token_type_ids 表示两个句子的分隔符，用于区分不同句子的 token。如果只有一个句子，那么 token_type_ids 中所有的值都为 0。在进行文本分类等任务时，通常只有一个句子，所以 token_type_ids 可以忽略。
+
+attention_mask 用于指示哪些 token 是实际输入，哪些 token 是填充的。在进行文本分类等任务时，所有的 token 都是实际输入，所以 attention_mask 中所有的值都为 1。
+
+当调用 tokenizer() 函数时，如果指定了 return_tensors='pt'，则该函数会返回 PyTorch 张量，包括三个部分：input_ids、token_type_ids 和 attention_mask。在 train_model() 函数中，只传入了 input_ids 和 labels，而 token_type_ids 和 attention_mask 则是在 tokenizer() 函数中生成并自动添加到了返回的 PyTorch 张量中。
+
+因此，你可以按照 train_model() 函数的写法，只传入 input_ids 和 labels，而不用手动指定 token_type_ids 和 attention_mask，因为它们已经被自动包含在了 input_ids 的张量中。
+
+问：
+attention_mask 用于指示哪些 token 是实际输入，哪些 token 是填充的。在进行文本分类等任务时，所有的 token 都是实际输入，所以 attention_mask 中所有的值都为 1  你这句话，那万一有些文本的长度不够呢，那是不是意味着一些token就是填充的
+答：
+是的，如果某些文本的长度不足最大长度，那么在向量化过程中就会用填充符号填充至最大长度。在这种情况下，对应的位置的 attention_mask 值就应该是 0，以区分实际输入和填充的部分。这样模型在计算时就不会将填充符号的信息考虑进去。
+
+问：
+那这个函数内部可以自动化处理这种实际长度或者填充的长度吗
+答：
+是的，tokenizer 的 encode_plus() 方法可以根据输入的文本自动将其编码成对应的 input_ids, attention_mask 和 token_type_ids。对于长度不足的文本，encode_plus() 会在文本末尾添加填充 token（例如 [PAD]）来将其填充到指定的长度。在训练时，模型会自动忽略填充 token。因此，你只需要提供文本列表，encode_plus() 方法会自动将其处理成适合输入到 BERT 模型中的格式。
+
+问：
+那我直接这样写outputs = model(input_ids, labels=batch['label'])，他会处理不够的长度来填充吗
+答：
+是的，这个model会自动处理长度不足的情况并进行填充。在调用tokenizer时，可以通过padding=True来进行自动填充。同时，填充的标记也会通过attention_mask的方式传递给模型，告诉模型哪些是实际输入的token，哪些是填充的token。所以你可以直接使用model(input_ids, labels=batch['label'])进行训练。
+
+
+
+
+
+
+
+新发现一个问题：
+我把数据优化一下，马上准确率就下降
+已解决
+
+
+
+要弄懂两个点：
+一个是训练中的损失函数那里的原理
+一个是预测中的激活函数那里的原理
+
+一般而言，深度学习模型的训练包括以下几个标准步骤：
+
+准备数据：包括数据的预处理、数据的分割等。
+定义模型：确定神经网络的结构和参数。
+定义损失函数：选择合适的损失函数来衡量模型输出和真实值之间的差距。
+定义优化器：选择合适的优化算法来更新模型参数以使损失函数最小化。
+训练模型：进行多轮迭代，每一轮包括以下几个步骤：
+    正向传播：将输入数据传入模型得到输出。
+    计算损失函数：将输出和真实值传入损失函数计算损失。
+    反向传播：根据损失函数求导，计算模型参数的梯度。
+    更新模型参数：使用优化器根据梯度更新模型参数。
+    模型评估：用测试数据集测试模型的性能。
+    模型保存：将训练好的模型保存下来以备后续使用。
+以上是深度学习模型训练的一般步骤，具体实现时可能会有些许差异。
+
+
+predicted = torch.argmax(logits, dim=1).item()
+predicted = (torch.sigmoid(outputs.logits) >= 0.5).int()[:, 1].item()
+搞清楚这两者的不同之处
+这两个预测值应该都是一个类似张量的东西，然后通过item()函数来取出单元素值
+item()的作用是取出单元素张量的元素值并返回该值,保持该元素类型不变
+
+
+# 得到每个类别的概率分布
+logits = outputs[0]
+probs = torch.softmax(logits, dim=1)
+# 返回预测结果和相应的概率值
+pred_label = torch.argmax(probs, dim=1).item()
+pred_prob = probs[0][pred_label].item()
+
+还有这个softmax
+
+
+简单记录一下softmax和sigmoid这两个激活函数的区别：
+softmax激活函数的主要作用是将输入转换为概率分布，使得所有的输出值在[0, 1]的范围内且总和为1。
+在多分类问题中，softmax通常被用来计算每个类别的概率，以便选择概率最高的类别作为输出。
+
+sigmoid激活函数的主要作用是将输入转换为0到1之间的实数，表示输入的概率或概率密度。
+在二分类问题中，sigmoid函数可以用来将输出值限制在[0,1]范围内，并表示样本属于正类的概率。
+
+在二分类的情况下，使用sigmoid激活函数和softmax激活函数的输出是等价的，
+因为softmax激活函数在二分类时会退化为sigmoid激活函数。
+因此，这两种激活函数在二分类任务中本质上是等价的，选择哪种激活函数取决于具体的任务需求。
+但是，当涉及到多类别分类时，这两种激活函数的输出就不相同了。
+
+对于sigmoid函数，每个类别的概率是独立计算的，因此它们的和不一定等于1。
+而对于softmax函数，它会把每个类别的概率进行归一化，使它们的和恰好为1。
+因此，在多分类任务中，使用softmax函数可以更好地表示概率分布。
+但是在二分类任务中，两种函数的效果可能相似。
+
+
+比较未经过微调的模型和经过微调之后的模型在我的文本分类上的性能
+
+再去下载几个其他的预训练模型，再训练几个模型看看效果
+
+
+一个非常重要但是可以能被忽略的问题：
+模型在输出层用激活函数计算类别概率的时候，实际上是不知道具体的0和1对应的具体的是什么标签，
+这个0和1对应的具体的标签需要我们自己来对应好，需要在训练数据集的时候就明确好，
+比如数据集某类正例就对应1，反例对应0
+不然如果0和1对应的具体类别没有对应好，模型训练好预测的时候，预测出的类别很可能刚好相反。
+
+
+
+
+
+防止过拟合的一些方法：
+output_hidden_states=True, hidden_dropout_prob=0.2,
+    #                                     attention_probs_dropout_prob=0.2这三个参数是什么
+
+output_hidden_states表示是否输出每一层的输出，通常用于fine-tuning或者下游任务中的一些特殊需求。当设置为True时，模型的输出将包括每一层的输出，而不仅仅是最后一层的输出。
+hidden_dropout_prob表示在Bert中应用于隐藏层的dropout率。在训练中，dropout可以帮助防止过拟合。
+attention_probs_dropout_prob表示在Bert中应用于attention层的dropout率。和hidden_dropout_prob类似，dropout可以帮助提高模型的泛化能力。
+
+对于防止过拟合，通常可以通过降低模型复杂度、增加训练数据、使用正则化等方式来解决。在Bert模型中，可以通过减小hidden_size或num_hidden_layers参数的值来减小模型复杂度，或者使用一些正则化方法，如权重衰减或Dropout等。
+其中，hidden_dropout_prob参数是控制Bert模型中每个隐藏层的Dropout概率，这个参数越大，模型的容量就越小，可能会降低过拟合的风险。而attention_probs_dropout_prob参数则是控制Bert模型中Attention层的Dropout概率，同样也可以起到降低模型复杂度的作用。不过，在实践中，这两个参数一般都是使用默认值0.1，而hidden_size和num_hidden_layers会更加频繁被调整。
+
+
+这两个参数的设置与过拟合的关系并不是一定成正比或者反比的关系，具体要根据具体情况来进行调整。
+hidden_dropout_prob 控制着 BERT 模型中隐藏层输出的 dropout 概率，通过随机丢弃一定比例的隐藏层输出，可以防止模型过拟合训练数据。但是如果设置过高，可能会影响模型的学习能力和表现。因此，需要在训练中反复尝试不同的值，找到一个合适的值。
+attention_probs_dropout_prob 控制着 BERT 模型中 self-attention 层的 dropout 概率。和 hidden_dropout_prob 类似，这个参数的值也需要根据具体情况来进行调整，以防止过拟合和影响模型表现。一般来说，它的设置可以和 hidden_dropout_prob 一致，也可以略小一些，具体要根据实验结果来确定。
+
+
+
+
+
+你可以使用config.save_pretrained()方法将你修改后的配置文件保存下来。具体操作可以参考以下代码：
+
+from transformers import BertConfig
+
+# 加载预训练模型的配置文件
+config = BertConfig.from_pretrained('bert-base-chinese')
+或者直接：
+config = BertConfig.from_pretrained(bert, output_hidden_states=True, hidden_dropout_prob=0.2,
+                                        attention_probs_dropout_prob=0.2)
+# 修改配置文件中的参数
+config.hidden_dropout_prob = 0.1
+
+# 保存修改后的配置文件
+config.save_pretrained('my_bert_config')
+
+执行上述代码后，会在当前目录下创建一个名为my_bert_config的文件夹，里面包含了你修改后的配置文件。以后你可以使用BertConfig.from_pretrained()方法加载你自己的配置文件。
+
+
+
+这条微博有14.12%的概率为谣言，有85.88%的概率为非谣言
+这条微博有51.99%的概率为谣言，有48.01%的概率为非谣言
+这条微博有72.31%的概率为谣言，有27.69%的概率为非谣言
+
+这条微博有65.29%的概率为谣言，有34.71%的概率为非谣言
+这条微博有62.68%的概率为非谣言，有37.32%的概率为谣言
+这条微博有99.90%的概率为谣言，有0.10%的概率为非谣言
+
+
+
+记录一下：
+在前端事件响应中，有两种响应方式：
+1.用$(document).ready(function() {
+       $('#predict-button').click(function() {
+这种写法是在文档加载完成后使用jQuery选择器获取页面元素并绑定事件处理函数，
+即当id为predict-button的元素被点击时，执行相应的处理函数。这种写法相当于使用jQuery的方式来绑定事件处理函数。
+这种button写法：不需要定义响应函数和button的type
+<button id="predict-button" class="btn btn-success btn-lg">分析</button>
+
+$(document).ready(function() {
+    $('#predict-button').click(function() {
+        //获取文本框的值
+        const inputText = $('#input-text').val();
+        // const inputText = document.getElementById("input-text").value;
+        $.ajax({
+            type: 'POST',
+            url: '/predict',
+            data: {'text': inputText},
+            timeout: 5000,
+            success: function(response) {
+                $('#result').text(response['result']);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+        $.post('/predict', {'text': inputText}, function(response) {
+            // 请求成功时的回调函数
+            $('#result').text(response['result']);
+        }).fail(function(error) {
+            // 请求失败时的回调函数
+            console.log(error);
+            // 其他错误处理
+        });
+    });
+});
+
+
+2.直接用function predict() {定义函数
+然后在button按钮中，指定该函数和tubbon的类型为buutton：
+<button type="button" onclick="predict()" id="predict-button" class="btn btn-success btn-lg">分析</button>
+或者在function定义完之后，在后面加一句：
+$('#predict-button').click(predict);
+这样就不需要在button中指定函数
+//函数方法二
+function predict() {
+    const inputText = $('#input-text').val();
+    $.ajax({
+        type: 'POST',
+        url: '/predict',
+        data: {'text': inputText},
+        success: function(response) {
+            $('#result').text(response['result']);
+        },
+        error: function(error) {
+            console.log(error);
+        }
+    });
+    //方法二
+    // $.post('/predict', {'text': inputText}, function(response) {
+    //     // 请求成功时的回调函数
+    //     $('#result').text(response['result']);
+    // }).fail(function(error) {
+    //     // 请求失败时的回调函数
+    //     console.log(error);
+    //     // 其他错误处理
+    // });
+}
+// $('#predict-button').click(predict);
+
+而 function predict() { 这种写法是定义一个名为predict的函数，
+在需要的时候直接调用该函数。这种写法不涉及DOM操作，可以在任何时候调用。
+总的来说，两种写法的使用场景不同，前者适用于需要响应用户操作的交互界面，后者适用于通用的函数调用。
+这两种方式均可以
+
+还有一个问题：
+这两种调用方式中，也涉及到两种通信方式：
+1：
+$.ajax({
+    type: 'POST',
+    url: '/predict',
+    data: {'text': inputText},
+    success: function(response) {
+        $('#result').text(response['result']);
+    },
+    error: function(error) {
+        console.log(error);
+    }
+});
+2：
+方法二
+$.post('/predict', {'text': inputText}, function(response) {
+    // 请求成功时的回调函数
+    $('#result').text(response['result']);
+}).fail(function(error) {
+    // 请求失败时的回调函数
+    console.log(error);
+    // 其他错误处理
+});
+这两种任选一种，各有好处，均可以
+
+
+
+记录一下：
+outputs.logits 的值取决于模型的输出层，也就是最后一层全连接层的输出。
+在二分类任务中，输出层通常是一个只有一个神经元的全连接层，它的输出值表示属于正例的概率。
+因此，outputs.logits 是一个形状为 (batch_size, 1) 的张量，其中每个元素都是一个实数，
+表示模型对每个样本属于正例的预测概率。
+
+在使用 torch.nn.BCEWithLogitsLoss() 计算二分类任务的损失函数时，
+需要将 outputs.logits 输入到该函数中进行计算，
+因为 BCEWithLogitsLoss 内部会将输出值经过 sigmoid 函数激活，
+将概率值转换成二分类的输出结果，并且同时计算二分类任务的损失值，这样可以避免数值稳定性问题。
+因此，BCEWithLogitsLoss 通常被用来计算二分类任务的损失函数。
+
+
+如果你的模型输出层是一个形状为 (768, num_label) 的张量，
+那么它可能是一个多标签分类模型，即每个样本可以属于多个标签中的一个或多个。
+在这种情况下，每个标签都需要进行独热编码，以便将其转换为模型输出张量的形状，也就是 (batch_size, num_label)。
+
+输出层形状为 (768, num_label) 的模型通常使用 softmax 函数将模型的预测转换为概率分布，
+以便在模型的训练中使用交叉熵损失函数来优化模型。在使用交叉熵损失函数计算损失时，
+需要将模型输出先经过 softmax 函数激活，然后与标签独热编码后的张量进行计算。
+这样可以得到一个形状为 (batch_size, num_label) 的张量，表示模型对每个样本属于每个标签的预测概率。
+然后，将这个张量与标签的独热编码张量进行计算，得到一个形状为 (batch_size, num_label) 的张量，
+表示每个样本在每个标签上的预测结果。最后，将这个张量输入到交叉熵损失函数中进行计算，得到模型的损失值。
+
+self.classifier = nn.Linear(config.hidden_size, config.num_labels)模型的输出层
+是的，这段代码定义了一个全连接层（Linear），它的输入维度为 config.hidden_size，输出维度为 config.num_labels。在BERT等预训练模型中，config.hidden_size 是隐层的维度，通常为 768 或 1024，而 config.num_labels 则是分类问题的类别数。
+
+因此，这段代码定义了一个将 BERT 的隐层作为输入，输出为对每个类别的预测概率的全连接层，可以视为模型的输出层。
+在训练过程中，通过最小化预测值与真实标签之间的差距（损失函数）来优化该全连接层的参数，以提高模型的分类性能。
+
+一个疑问：
+为什么我的标签的形状
+labels = data[3].to(device).squeeze()变成
+labels = data[3].to(device).squeeze(1)
+训练结果就变成50%的准确率 其实不是50%，只是正好样本一半正一半反
+还有：labels = one_hot_encoding(labels, num_labels)
+在将label变成独热编码的时候，将张量转移到cuda上的前后顺序不对，计算结果也会产生巨大的影响
+
+
+
+
+如果你已经有了一个微博谣言数据集，并想要进一步扩充这个数据集，可以考虑以下几种方法：
+
+1. 通过搜索相关关键词的方式，收集更多的与原始数据集主题相关的微博信息，并筛选出可疑的谣言文本进行加入。
+
+2. 利用不同的来源渠道，如微信、微博、新闻等，获取相关的传闻、言论、新闻信息，根据自己的判断挑选出具有代表性且可能存在的谣言信息。
+
+3. 利用社交媒体和在线社区平台，如知乎、微博等，寻找有关实验主题的讨论和争议，从中提取可能存在的谣言信息。
+
+4. 运用文本增强技术，对原有的微博谣言数据集进行扩充。例如，通过同义词替换、词汇插入、删除等手段，生成更多的谣言文本样本。
+
+5. 利用生成式模型，在原有数据集的基础上生成更多的谣言文本。例如，使用LSTM、GAN等模型进行生成式学习，生成更多的谣言文本样本。
+
+以上方法都需要对扩充后的数据进行筛选和标注，以保证数据的质量和可靠性。同时，为了避免重复和相似的数据，可以使用聚类、去重等技术进行处理。最后，需要注意在扩充数据过程中遵守相关法律法规和道德标准，尊重他人权益和隐私。
+
+
+
+
+
+可以使用以下几种方法来通过同义词替换、词汇插入、删除等手段生成更多谣言文本样本：
+
+1. 同义词替换：将原有的微博谣言数据集中某些关键词替换为其同义词或相近的词语，从而获得更多的文本样本。同义词替换可以利用词典或者基于机器学习的方法，例如WordNet、GloVe等。
+
+2. 词汇插入：在原有的微博谣言数据集中随机插入一些词语，从而扩充数据集规模。插入的词可以是与主题相关的词汇，也可以是无关的词汇。此外，可以借助语言模型，如BERT等，选择合适的词进行插入。
+
+3. 删除操作：在原有的微博谣言数据集中删除一些内容，例如删除包含关键词的句子、段落等，以此获得更多的文本样本。同时需要保证删除后的数据仍然具有一定的语义信息和连贯性。
+
+4. 句式转化：对原始的微博谣言数据集中的句子进行结构和语法的变换，获得更多的句式样本。例如将肯定句转化为否定句，改变主语或宾语位置等。
+
+以上方法可以单独或组合使用，以获得更多的谣言文本样本。需要注意的是，生成的谣言文本需要经过筛选和标注，以保证数据的质量和可靠性。同时，在扩充数据的过程中需要遵循相关法律法规和道德标准。
+
+
+
+
+
+
+当我们使用同义词替换、词汇插入、删除等手段来生成更多的谣言文本样本时，需要考虑以下几点：
+
+1. 同义词替换：可以使用在线或离线的词典或基于机器学习的方法来寻找同义词。例如，WordNet是一个常用的词典资源，它提供了许多同义词和词语之间的关系。除此之外，还有一些基于预训练模型的方法可以通过预测同义词或相似词，如GloVe、FastText等。
+
+2. 词汇插入：在生成新的文本时，需要确定插入的词汇是否与原始文本相关，避免插入无意义的词汇。可以使用预训练模型如BERT和GPT系列模型来挑选适合的词汇进行插入。同时，需要注意插入的位置，以保持插入后的文本流畅性。
+
+3. 删除操作：在删除操作中，需要依据数据的实际情况挑选删除条件，可以删除与主题不相关的文本片段，也可以删除与谣言不相关的句子，保留具有代表性和可靠性的文本信息。
+
+4. 句式转化：要确保句式转换后的语句符合语法规则，并且具有一定的连贯性和可读性。可以使用语言模型如BERT、GPT等来生成符合语言规则的句式。
+
+需要注意的是，在扩充数据集时，数据的数量不应成为唯一的目标，保证数据集的质量和可靠性同样重要。最好进行筛选和标注，以确保生成的谣言文本样本与原始数据集具有相似的特点和严谨性。
+
+
+
+
+
+
+
+
+BERT是一种预训练语言模型，它在NLP任务中具有很高的效果。我们可以使用BERT来进行词汇插入和句式转化。以下是具体的介绍：
+
+1. 词汇插入
+
+在BERT中，输入文本的每个词都会被转换为向量形式，并且这些向量可以通过向量加法或减法来获得相似的向量。因此，我们可以使用BERT来选择与我们想要插入的单词相似的单词。
+
+首先，我们需要将句子输入BERT中，该过程称为“嵌入”。然后，我们可以计算出新单词与原始单词之间的向量差异，找到最接近的同义词，并将其插入到原始单词的位置。
+
+2. 句式转化
+
+在BERT中，我们可以使用掩码语言模型（Masked Language Modeling, MLM）任务进行句式转化。在MLM任务中，模型需要从句子中随机屏蔽一些词，并预测这些被遮盖的词。我们可以利用这个任务，将原始句子转换为其他类似的句子。
+
+具体来说，我们将随机选择某些单词并用[Mask]标记代替。然后，我们将这个句子放入BERT模型中，并在[Mask]处获得一个新的向量。最后，我们使用该向量来预测在这个位置上应该是什么词。然后我们可以将原始句子中的[Mask]替换为新的单词，从而生成一个新的句子。
+
+需要注意的是，使用BERT进行词汇插入和句式转化时需要对模型进行微调，以便模型能够更好地学习任务特定的语义和句法信息。此外，在进行数据扩充时，需要谨慎挑选插入的单词和转化的句子，以保证文本的连贯性和合理性。
+
+
+
+
+
+
+
+
+当使用BERT模型来进行词汇插入和句式转化时，需要使用特定的库和工具来处理BERT模型。下面是使用Python代码实现BERT模型的词汇插入和句式转化的示例：
+
+首先，我们需要安装适当的库，如`transformers`、`torch`等：
+
+```python
+!pip install transformers
+!pip install torch
+```
+
+接下来，我们可以定义一个BERT模型并使用其进行词汇插入：
+
+```python
+import torch
+from transformers import BertTokenizer, BertModel
+
+# 加载BERT模型及其tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+model = BertModel.from_pretrained('bert-base-uncased')
+
+# 定义原始句子和需要插入的单词
+text = "The quick brown fox jumps over the lazy dog"
+new_word = "smart"
+
+# 对句子进行tokenize，并在需要插入单词的位置插入[MASK]符号
+tokenized_text = tokenizer.tokenize(text)
+mask_index = tokenized_text.index("brown")
+tokenized_text[mask_index] = "[MASK]"
+
+# 将token转换为id，并将其放入tensor中
+indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+tokens_tensor = torch.tensor([indexed_tokens])
+
+# 在模型中运行输入的句子
+with torch.no_grad():
+    outputs = model(tokens_tensor)
+
+# 获取需要插入单词的位置的向量表示
+masked_embeddings = outputs[0][0][mask_index]
+
+# 计算新单词的向量表示并插入到原始句子中
+new_word_embeddings = masked_embeddings + model.transformer.wte.weight[tokenizer.convert_tokens_to_ids(new_word)]
+tokenized_text[mask_index] = new_word
+final_text = tokenizer.convert_tokens_to_string(tokenized_text)
+print(final_text)
+```
+
+在上述代码中，我们首先加载BERT模型及其tokenizer，在原始句子中找到需要替换的单词，并将其替换为[MASK]。然后，我们将标记的文本输入BERT模型中，并获取需要替换的单词所在位置的向量表示。最后，我们从词汇表中获取要插入的新单词对应的向量表示，并将其与原始向量加和得到新的向量表示。最终，我们可以将原始句子中的[MASK]替换成新的单词。
+
+接下来，我们可以使用掩码语言模型任务来进行句式转化：
+
+```python
+# 微调BERT模型以处理MLM任务
+model.train()
+
+# 定义原始句子
+text = "The quick brown fox jumps over the lazy dog"
+
+# 对句子进行tokenize，并在随机选择的位置插入[MASK]符号
+tokenized_text = tokenizer.tokenize(text)
+mask_index = 3
+tokenized_text[mask_index] = "[MASK]"
+
+# 将token转换为id，并将其放入tensor中
+indexed_tokens = tokenizer.convert_tokens_to_ids(tokenized_text)
+tokens_tensor = torch.tensor([indexed_tokens])
+
+# 运行模型以获得mask处的隐藏表示
+with torch.no_grad():
+    outputs = model(tokens_tensor)
+
+# 获取mask处的隐藏表示
+masked_embeddings = outputs[0][0][mask_index]
+
+# 使用隐藏表示预测新单词
+softmax_weights = model.cls.predictions.decoder.weight
+new_tokens_logits = torch.matmul(masked_embeddings, softmax_weights.T)
+new_tokens_probs = torch.nn.functional.softmax(new_tokens_logits, dim=-1)
+top_new_tokens = torch.topk(new_tokens_probs, k=5).indices[0].tolist()
+
+# 替换mask处的标记为预测到的单词
+for new_token in top_new_tokens:
+    predicted_token = tokenizer.convert_ids_to_tokens([new_token])[0]
+    tokenized_text[mask_index] = predicted_token
+    print(tokenizer.convert_tokens_to_string(tokenized_text))
+```
+
+在上述代码中，我们首先微调BERT模型以处理MLM任务。然后，我们对输入句子进行tokenize，并随机选择一个位置插入[MASK]符号。接着，我们使用与词汇插入相同的方法来获取在给定位置的隐藏表示，并使用该表示预测可能的新单词。最后，我们替换原始句子中的[MASK]符号，并打印生成的句子。
+
+
+
+
+如果是批量数据集，我们可以使用PyTorch DataLoader类来批处理数据集并将其输入到模型中。首先，我们需要定义一个自定义数据集类，并实现`__getitem__`和`__len__`方法来对数据进行加载和预处理。下面是一个示例：
+
+```python
+from torch.utils.data import Dataset
+
+class MyDataset(Dataset):
+    def __init__(self, data):
+        self.data = data
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        text = self.data[index]
+
+        # 对文本进行预处理，如tokenize等
+        tokenized_text = tokenizer.tokenize(text)
+        return tokenized_text
+```
+
+然后，我们可以定义一个DataLoader来批处理数据：
+
+```python
+from torch.utils.data import DataLoader
+
+dataset = MyDataset(data_list)
+dataloader = DataLoader(dataset, batch_size=32, shuffle=True)
+
+for batch in dataloader:
+    # 将批次中的文本转换为id，并且放入tensor中
+    indexed_tokens = [tokenizer.convert_tokens_to_ids(text) for text in batch]
+    tokens_tensor = torch.tensor(indexed_tokens)
+
+    # 在模型中运行输入的句子
+    with torch.no_grad():
+        outputs = model(tokens_tensor)
+
+    # 对输出进行处理，如获取需要插入单词的位置的向量表示、使用MLM任务生成新句子等
+    # ...
+```
+
+在上述代码中，我们首先创建了一个DataLoader对象，并使用自定义数据集加载数据。然后我们迭代DataLoader，每次处理一个批次的文本，并将其转换为id，并放入tensor中。最后，我们将输入的句子传递给模型，并对模型的输出进行进一步的处理，如获取需要插入单词的位置的向量表示，使用MLM任务生成新句子等。
+
+
+
+
+那怎样通过wordnet来进行同义词替换，如何通过GloVe、FastText来进行同义词替换
+
+
+WordNet是一个英语词汇数据库，其中包含了单词的分类、定义以及它们之间的关系。在Python中，我们可以使用`nltk`库来访问WordNet。具体来说，我们可以使用`nltk.corpus.wordnet`模块来查找单词的同义词。下面是一个示例：
+
+```python
+import nltk
+from nltk.corpus import wordnet
+
+nltk.download('wordnet')
+
+# 获取一个单词的同义词集
+synsets = wordnet.synsets('apple')
+
+# 打印同义词集及其同义词
+for synset in synsets:
+    print(f'{synset.name()} => {", ".join(synset.lemma_names())}')
+```
+
+在上述代码中，我们首先下载WordNet数据，并使用`wordnet.synsets`方法获取一个单词的同义词集。然后，我们迭代同义词集并打印它们的同义词。
+
+对于使用GloVe和FastText来进行同义词替换，我们可以加载预先训练好的词向量，并使用词向量来寻找相似的单词，并将其用作同义词。下面是一个使用GloVe词向量来进行同义词替换的示例：
+
+```python
+import numpy as np
+from gensim.scripts.glove2word2vec import glove2word2vec
+from gensim.models import KeyedVectors
+
+# 将GloVe向量转换为Word2Vec向量
+glove_input_file = 'glove.6B.100d.txt'
+word2vec_output_file = 'glove.6B.100d.word2vec.txt'
+_ = glove2word2vec(glove_input_file, word2vec_output_file)
+
+# 加载词向量模型
+model = KeyedVectors.load_word2vec_format(word2vec_output_file, binary=False)
+
+# 获取一个单词的同义词
+word = 'apple'
+similarity_threshold = 0.5
+synonyms = [w for w, s in model.most_similar(word) if s > similarity_threshold]
+
+# 输出同义词并用其中一个进行替换
+print(f'Synonyms for "{word}": {", ".join(synonyms)}')
+
+if synonyms:
+    new_word = synonyms[0]
+    text = 'I like to eat apples'
+    new_text = text.replace(word, new_word)
+    print(new_text)
+```
+
+在上述代码中，我们首先将GloVe向量文件转换为Word2Vec向量文件，并使用Gensim库加载词向量模型。然后，我们使用词向量模型查找具有相似度大于阈值的单词，并将它们作为同义词。最后，我们可以将原始文本中的单词使用一个新的同义词进行替换。
+
+和GloVe类似，我们也可以使用FastText来进行同义词替换。唯一的区别是要使用FastText词向量模型来加载词向量。下面是使用FastText进行同义词替换的示例：
+
+```python
+from gensim.models import FastText
+
+# 加载FastText词向量模型
+model = FastText.load_fasttext_format('cc.en.300.bin')
+
+# 获取一个单词的同义词
+word = 'apple'
+similarity_threshold = 0.5
+synonyms = [w for w, s in model.most_similar(word) if s > similarity_threshold]
+
+# 输出同义词并用其中一个进行替换
+print(f'Synonyms for "{word}": {", ".join(synonyms)}')
+
+if synonyms:
+    new_word = synonyms[0]
+    text = 'I like to eat apples'
+    new_text = text.replace(word, new_word)
+    print(new_text)
+```
+
+在上述代码中，我们首先加载FastText词向量模型，并使用它查找相似度大于阈值的同义词。最后，我们可以使用一个新的同义词来替换原始文本中的单词。
+
+
+
+
+
+对于中文数据集，我们可以使用以下方式来进行同义词替换：
+
+1. 使用中文词向量模型。有许多预训练的中文词向量模型可供选择，如腾讯开源的中文词向量、哈工大开源的中文词向量等。我们可以加载这些模型，并使用它们来寻找具有相似向量表示的单词。
+
+2. 使用中文词典。中文词典包含了大量的中文单词及其同义词。我们可以将这些同义词作为替换的候选项，并根据上下文来选择最合适的同义词进行替换。
+
+下面是一个使用中文词向量进行同义词替换的示例：
+
+```python
+import numpy as np
+from gensim.models import KeyedVectors
+
+# 加载中文词向量模型
+model = KeyedVectors.load_word2vec_format('zh.vec', binary=False)
+
+# 获取一个中文单词的同义词
+word = '苹果'
+similarity_threshold = 0.5  # 相似度阈值
+synonyms = [w for w, s in model.most_similar(word) if s > similarity_threshold]
+
+# 输出同义词并用其中一个进行替换
+print(f'Synonyms for "{word}": {", ".join(synonyms)}')
+
+if synonyms:
+    new_word = synonyms[0]
+    text = '我喜欢吃苹果'
+    new_text = text.replace(word, new_word)
+    print(new_text)
+```
+
+在上述代码中，我们首先加载了一个中文词向量模型，并使用它查找具有相似度大于阈值的同义词。最后，我们可以使用一个新的同义词来替换原始文本中的单词。
+
+如果我们选择使用中文词典进行同义词替换，则需要选用一些高质量的中文词典，并实现相应的替换算法。下面是一个使用哈工大同义词词林进行同义词替换的示例：
+
+```python
+import jieba
+import re
+
+# 加载哈工大同义词词林
+synonyms_dict = {}
+with open('synonyms.txt', 'r', encoding='utf-8') as f:
+    for line in f:
+        words = re.split(r'[,\s]+', line.strip())
+        if len(words) > 1:
+            for w in words:
+                synonyms_dict[w] = words[0]
+
+# 分词并替换同义词
+text = '我喜欢吃苹果'
+words = jieba.cut(text)
+new_words = [synonyms_dict.get(w, w) for w in words]
+new_text = ''.join(new_words)
+
+print(new_text)
+```
+
+在上述代码中，我们首先加载了一个哈工大同义词词林，并将其中每个单词及其同义词存储到一个字典中。然后，我们对原始文本进行分词，并使用词典来查找每个单词的同义词。最后，我们使用替换后的结果来重构文本。
+
+
+
+
+
+怎样使用LSTM、GAN等模型进行生成式学习，生成更多的谣言文本样本。
+
+要使用LSTM模型进行生成式学习，生成更多的谣言文本样本，我们可以使用以下步骤：
+
+1. 数据预处理：首先需要准备用于训练LSTM模型的数据集。对于谣言文本，我们可以收集一些已确认为谣言的文章，提取其中的句子或段落作为训练数据。然后，我们需要对数据进行预处理，包括分词、去除停用词、构建词汇表等。
+
+2. 构建LSTM模型：接下来，我们需要构建LSTM模型。LSTM是一种适合于序列数据的循环神经网络，它具有长时记忆的能力，可以学习序列中的时间依赖关系。我们可以使用Keras等深度学习框架来构建LSTM模型，并将其训练在预处理好的数据集上。
+
+3. 训练模型：在构建好LSTM模型后，我们需要将其训练在预处理好的数据集上。我们可以将数据集划分为训练集和验证集，使用梯度下降算法来最小化损失函数并优化模型参数。
+
+4. 生成文本：在训练完LSTM模型后，我们可以使用该模型来生成新的谣言文本样本。具体来说，我们可以先随机选择一个起始文字或短语，将其作为LSTM模型的输入，并使用模型输出的概率分布来生成下一个文字或短语。重复这个过程，直到生成足够长的文本。
+
+下面是一个使用Keras构建LSTM模型进行谣言文本生成的示例：
+
+```python
+from keras.models import Sequential
+from keras.layers import Dense, LSTM, Embedding
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+import numpy as np
+
+# 准备数据
+texts = ['某些食品添加剂含有致癌物质',
+         '口罩会导致二氧化碳中毒',
+         '喝酒后吃药会中毒',
+         '狗能够感染新冠病毒']
+
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(texts)
+sequences = tokenizer.texts_to_sequences(texts)
+max_length = max([len(seq) for seq in sequences])
+padded_sequences = pad_sequences(sequences, maxlen=max_length, padding='post')
+
+x = padded_sequences[:, :-1]
+y = padded_sequences[:, 1:]
+
+vocab_size = len(tokenizer.word_index) + 1
+
+# 构建模型
+model = Sequential()
+model.add(Embedding(vocab_size, 50, input_length=max_length-1))
+model.add(LSTM(100, return_sequences=True))
+model.add(LSTM(100))
+model.add(Dense(vocab_size, activation='softmax'))
+model.compile(loss='categorical_crossentropy', optimizer='adam')
+
+# 训练模型
+model.fit(x, y, epochs=100)
+
+# 生成新文本
+def generate_text(model, tokenizer, max_length, seed_text, n_words):
+    for _ in range(n_words):
+        sequence = tokenizer.texts_to_sequences([seed_text])[0]
+        sequence = pad_sequences([sequence], maxlen=max_length-1, padding='post')
+        
+        prob = model.predict(sequence)[0]
+        y_pred = np.random.choice(range(vocab_size), size=1, p=prob)[0]
+        pred_word = tokenizer.index_word[y_pred]
+        
+        seed_text += ' ' + pred_word
+    return seed_text
+
+# 使用模型生成新的谣言文本
+seed_text = '食品添加剂可以导致'
+generated_text = generate_text(model, tokenizer, max_length, seed_text, 10)
+print(generated_text)
+```
+
+在上述代码中，我们首先准备了一个简单的谣言文本数据集，并使用Keras内置的Tokenizer类对其进行预处理。然后，我们构建了一个两层LSTM模型，并将其训练在预处理好的数据集上。最后，我们使用该模型生成新的谣言文本样本，其中seed_text为开始的种子词语，n_words表示要生成的单词数。
+
+需要注意的是，生成的文本可能会包含错误或不符合逻辑的内容。因此，我们应该对生成的文本进行筛选和修改，以确保其准确性和可信度。
+
+
+
+
+
+是的，使用中文预训练模型如ChineseBERT可以帮助我们生成更多的谣言数据文本。具体流程如下：
+
+1. 准备数据集：首先需要准备用于训练ChineseBERT模型的谣言文本数据集。可以收集一些已确认为谣言的文章，提取其中的句子或段落作为训练数据。为了保证数据的质量，最好确保这些谣言数据来源可信，且是真实存在的谣言。
+
+2. Fine-tuning模型：接下来，我们需要加载ChineseBERT模型并Fine-tuning它，使得该模型可以生成符合谣言文本特征的文本数据。Fine-tuning是指在一个预训练模型的基础上，根据自己的数据集进行再次训练。我们可以使用Hugging Face提供的Transformers库中的API来完成Fine-tuning过程。
+
+3. 生成文本：在Fine-tuning完成后，我们就可以使用Fine-tuning后的ChineseBERT模型来生成新的谣言文本样本。具体来说，我们可以给定一个初始文本，然后使用模型不断迭代地预测新的文本序列，从而生成新的谣言文本。
+
+下面是一个使用ChineseBERT Fine-tuning来生成谣言文本的示例：
+
+```python
+from transformers import BertTokenizer, BertForMaskedLM
+import torch
+
+# 加载预训练ChineseBERT模型和Tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-chinese')
+model = BertForMaskedLM.from_pretrained('bert-base-chinese')
+
+# 准备谣言文本数据集
+rumor_texts = ['某些食品添加剂含有致癌物质',
+               '口罩会导致二氧化碳中毒',
+               '喝酒后吃药会中毒',
+               '狗能够感染新冠病毒']
+
+# Fine-tuning模型
+optimizer = torch.optim.AdamW(model.parameters(), lr=5e-5)
+for text in rumor_texts:
+    inputs = tokenizer.encode(text, return_tensors='pt')
+    outputs = model(inputs, labels=inputs)
+    loss = outputs.loss
+    loss.backward()
+    optimizer.step()
+    optimizer.zero_grad()
+
+# 使用模型生成新的谣言文本
+def generate_text(model, tokenizer, init_text, n_words):
+    text = init_text
+    for i in range(n_words):
+        tokens = tokenizer.encode(text)
+        masked_index = len(tokens) - 1
+        tokens[masked_index] = tokenizer.mask_token_id
+        input_tensor = torch.tensor([tokens])
+        logits = model(input_tensor)[0]
+        probs = logits[0, masked_index].softmax(dim=0).tolist()
+        predicted_index = probs.index(max(probs))
+        predicted_token = tokenizer.convert_ids_to_tokens([predicted_index])[0]
+        text += predicted_token.replace('##', '')
+    return text
+
+# 使用Fine-tuned ChineseBERT模型生成谣言文本
+init_text = '食品添加剂可以导致'
+generated_text = generate_text(model, tokenizer, init_text, 10)
+print(generated_text)
+```
+
+在上述代码中，我们首先使用Hugging Face提供的API加载了预训练的ChineseBERT模型和Tokenizer。然后，我们Fine-tuning了该模型，使得它可以生成符合谣言文本特征的文本数据。最后，我们使用该模型生成新的谣言文本样本，其中init_text为开始的种子词语，n_words表示要生成的单词数。
+
+需要注意的是，由于Fine-tuning所需的计算资源较大，因此需要有足够的GPU资源，特别是当数据集较大时。此外，生成的文本也可能包含错误或不符合逻辑的内容，需要进行人工筛选和修改。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+可以使用GAN（Generative Adversarial Networks）模型进行生成式学习，从而生成更多的谣言文本样本。GAN是一种深度学习模型，它由两个神经网络组成：生成器和判别器。其中，生成器负责生成文本数据，判别器则负责判断给定的文本数据是真实数据还是生成数据。整个GAN模型的目标是让生成器生成的数据变得越来越逼真，以至于判别器无法区分哪些数据是真实的，哪些是生成的。
+
+下面是一个使用GAN模型进行生成式学习的示例：
+
+1. 准备数据集：首先需要准备用于训练GAN模型的谣言文本数据集。可以收集一些已确认为谣言的文章，提取其中的句子或段落作为训练数据。为了保证数据的质量，最好确保这些谣言数据来源可信，且是真实存在的谣言。
+
+2. 构建GAN模型：接下来，我们需要构建GAN模型，并对其进行训练。具体来说，我们可以使用GAN的基本组成部分——生成器和判别器来构建模型。生成器负责生成文本数据，判别器则负责判断给定的数据是来自于训练数据还是生成器生成的数据。我们可以采用RNN、LSTM、Transformer等序列生成模型来构建生成器和判别器。
+
+3. 训练GAN模型：在构建完毕GAN模型后，我们需要使用真实的谣言文本数据进行训练。具体来说，我们需要将真实数据和生成数据分别送入判别器进行判断。对于真实数据，判别器的目标是尽可能地将其判断为真实数据；对于生成数据，判别器的目标则是将其判断为生成数据。同时，在训练生成器时，我们可以使用带有负反馈信息的损失函数来指导生成器生成更逼真的谣言文本样本。
+
+下面是一个基于RNN的GAN模型的示例代码：
+
+```python
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# 定义生成器
+class Generator(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim):
+        super(Generator, self).__init__()
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+        self.hidden_dim = hidden_dim
+        self.embeddings = nn.Embedding(vocab_size, embedding_dim)
+        self.rnn = nn.GRU(embedding_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, vocab_size)
+
+    def forward(self, x, h):
+        embedded = self.embeddings(x)
+        output, h = self.rnn(embedded, h)
+        output = self.fc(output)
+        return output, h
+
+    def init_hidden(self, batch_size):
+        return torch.zeros(1, batch_size, self.hidden_dim)
+
+# 定义判别器
+class Discriminator(nn.Module):
+    def __init__(self, vocab_size, embedding_dim, hidden_dim):
+        super(Discriminator, self).__init__()
+        self.vocab_size = vocab_size
+        self.embedding_dim = embedding_dim
+        self.hidden_dim = hidden_dim
+        self.embeddings = nn.Embedding(vocab_size, embedding_dim)
+        self.rnn = nn.GRU(embedding_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, 1)
+
+    def forward(self, x, h):
+        embedded = self.embeddings(x)
+        output, h = self.rnn(embedded, h)
+        output = self.fc(output)
+        return output[:, -1], h
+
+    def init_hidden(self, batch_size):
+        return torch.zeros(1, batch_size, self.hidden_dim)
+
+# 训练GAN模型
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+vocab_size = 10000
+embedding_dim = 128
+hidden_dim = 256
+batch_size = 64
+
+generator = Generator(vocab_size, embedding_dim, hidden_dim).to(device)
+discriminator = Discriminator(vocab_size, embedding_dim, hidden_dim).to(device)
+
+optimizer_G = optim.Adam(generator.parameters(), lr=0.0002)
+optimizer_D = optim.Adam(discriminator.parameters(), lr=0.0002)
+
+criterion = nn.BCEWithLogitsLoss()
+
+dataset = ... # 加载谣言文本数据集
+dataloader = torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
+for epoch in range(num_epochs):
+    for i, data in enumerate(dataloader):
+        real_data = data.to(device)
+
+        # 训练判别器
+        discriminator.zero_grad()
+        real_labels = torch.ones(batch_size, 1).to(device)
+        fake_labels = torch.zeros(batch_size, 1).to(device)
+        real_outputs, _ = discriminator(real_data[:-1], discriminator.init_hidden(batch_size))
+        fake_outputs, _ = discriminator(generator(real_data[:-1], generator.init_hidden(batch_size))[0], discriminator.init_hidden(batch_size))
+        real_loss = criterion(real_outputs, real_labels)
+        fake_loss = criterion(fake_outputs, fake_labels)
+        d_loss = real_loss + fake_loss
+        d_loss.backward()
+        optimizer_D.step()
+
+        # 训练生成器
+        generator.zero_grad()
+        fake_labels = torch.ones(batch_size, 1).to(device)
+        fake_outputs, _ = discriminator(generator(real_data[:-1], generator.init_hidden(batch_size))[0], discriminator.init_hidden(batch_size))
+        g_loss = criterion(fake_outputs, fake_labels)
+        g_loss.backward()
+        optimizer_G.step()
+
+        if i % 50 == 0:
+            print('[%d/%d][%d/%d]\tloss_D: %.4f\tloss_G: %.4f'
+                  % (epoch+1, num_epochs, i, len(dataloader),
+                     d_loss.item(), g_loss.item()))
+
+# 使用生成器生成谣言文本
+def generate_text(generator, seed_text, max_length):
+    generated_text = []
+    with torch.no_grad():
+        h = generator.init_hidden(1).to(device)
+        x = torch.tensor([tokenizer.encode(seed_text)]).to(device)
+        while len(generated_text) < max_length:
+            outputs, h = generator(x[:, :-1], h)
+            _, next_word = torch.topk(outputs[:, -1, :], k=1)
+            if next_word.item() == tokenizer.pad_token_id:
+                break
+            generated_text.append(tokenizer.convert_ids_to_tokens([next_word.item()])[0])
+            x = torch.cat([x, next_word.unsqueeze(0)], dim=-1)
+    return ''.join(generated_text)
+
+# 使用生成器生成谣言文本
+seed_text = '某些食品添加剂含有'
+max_length = 50
+generated_text = generate_text(generator, seed_text, max_length)
+print(generated_text)
+```
+
+在上述代码中，我们首先定义了生成器和判别器模型，并使用Adma优化器对其进行训练。在每次迭代中，我们先训练判别器，然后训练生成器。需要注意的是，在生成器中，我们使用带有负反馈信息的BCEWithLogitsLoss作为损失函数，以便生成器可以尽可能地生成逼真的谣言文本。
+
+最后，我们可以使用训练好的生成器模型来生成新的谣言文本样本。具体来说，我们可以给定一个初始文本，然后使用模型不断迭代地预测新的文本序列，从而生成新的谣言文本。
+
+
+
+
+
+明天主要任务：尝试运用上面的方式，进行数据集扩充，再进行模型训练，对比模型性能
+
+
+请帮我写一段代码，我要从文本中读取文本信息，每一行的数据包括一个标签和一段文字，然后我需要对这段文字用jieba进行高级别的精确的分词，然后需要输入到tokenizer(text,
+                          padding=True,
+                          truncation=True,
+                          max_length=256,
+                          return_tensors='pt',
+                          do_basic_tokenize=False).input_ids.cuda()这个函数中去，获得我这段文字对应的token id
+
+
+写论文的时候：
+1.注意对比我的最佳模型和其他尝试的模型的各项性能指标的对比，准确率，召回率，F1等
+2.列出不同学习率，不同的batch_size，同时有没无其他的优化方式（正则化技术等等），训练模型的不同结果对比列举出来
+3.最好多画一些图，来佐证自己的实验结果
+
+
+
+最新尝试：
+之前训练的模型，都是将没有经过任何处理的文本直接输入进模型中，
+由模型内部自动进行分词等操作，这样可能模型并没有很能学习到更多更好的信息，
+所以其他方面都完成的差不多的时候，
+准备测试一下先将文本进行其他分词工具分词之后，输入进模型，进行训练，然后看看模型的效果
+
+
+
+
+用pydoc -w Text_Classification
+命令生成帮助文档
