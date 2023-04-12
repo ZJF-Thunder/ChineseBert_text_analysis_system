@@ -1,0 +1,6 @@
+此文件夹下存放一些软件包，例如bert、transformers等
+可以删除，也可以保留，没有其他实际用途，仅用于学习和研究
+如果删除，可以到github仓库下载
+下载地址：
+https://github.com/google-research/bert
+https://github.com/huggingface/transformers

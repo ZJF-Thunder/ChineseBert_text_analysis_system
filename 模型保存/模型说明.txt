@@ -1,0 +1,4 @@
+此文件夹下面存放微调后的模型，用于微博谣言文本分类，本人已将这个文件夹上传到huggingface仓库，
+仓库地址：https://huggingface.co/ZJF-Thunder/ChineseBert_text_analysis_system
+可以直接克隆项目(复制到git命令行中)：git clone https://huggingface.co/ZJF-Thunder/ChineseBert_text_analysis_system
+也可以点击文件夹，单独下载模型。

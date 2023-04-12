@@ -1,0 +1,6 @@
+此文件夹下面存放预训练模型，用于微调下游任务，模型下载地址(复制到git命令行中)：
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext-large
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext
+git clone https://huggingface.co/hfl/chinese-bert-wwm-ext
+git clone https://huggingface.co/hfl/chinese-bert-wwm
+git clone https://huggingface.co/bert-base-chinese
