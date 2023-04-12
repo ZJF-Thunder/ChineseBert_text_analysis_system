@@ -1064,3 +1064,6 @@ print(generated_text)
 
 用pydoc -w Text_Classification
 命令生成帮助文档
+
+https://github.com/ymcui/Chinese-BERT-wwm
+该网址对比其他chinese模型的效果
