@@ -6,9 +6,21 @@ ZJF-Thunder/ChineseBert_text_analysis_system
 
 1.系统运行必要文件：
 
-需要去github仓库下载预训练模型chinese-bert-wwm-ext或bert-base-chinese或其他chinesebert模型，
+需要去huggingface仓库下载预训练模型chinese-bert-wwm-ext或bert-base-chinese或其他chinesebert模型，
 
-保存到路径./models/chinese-bert-wwm-ext中
+下载命令：
+
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext-large
+
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext
+
+git clone https://huggingface.co/hfl/chinese-bert-wwm-ext
+
+git clone https://huggingface.co/hfl/chinese-bert-wwm
+
+git clone https://huggingface.co/bert-base-chinese
+
+保存到路径./models/中
 
 2.训练模型所需数据集存放在data目录中，
 
