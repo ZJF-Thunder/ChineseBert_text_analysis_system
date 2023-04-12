@@ -820,13 +820,13 @@ def main():
     all_data_path = "./data/all_data.txt"
     # 将数据集解压，并将json文件数据处理保存成txt文本  没有扩充之前的数据集
     # data_preprocessing(src_path, target_path)
-
     # 划分训练集和测试集
     # train_data, test_data = splitting_dataset(all_data_path)
+
     # 获取谣言和非谣言的数据条数
-    get_rumor_norumor_num("./data/all_data2.txt")
+    get_rumor_norumor_num("./data/all_data3.txt")
     # 用扩充之后的数据集按照特定比例划分训练集和测试集，all_data2.txt为扩充之后的数据集
-    train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0)
+    train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0.9)
 
     # # 可以舍弃
     # # 装载数据的根目录，负责存放数据txt文本
@@ -843,7 +843,8 @@ def main():
     # tokenizer = BertTokenizer('gdrive/My Drive/Colab Notebooks/vocab.txt')
 
     # 定义预训练模型
-    bert = './models/chinese-bert-wwm-ext'
+    bert = './models/chinese-roberta-wwm-ext'
+    # bert = './models/chinese-bert-wwm-ext'
     # bert = './models/bert-base-chinese'
     # 加载原始config文件
     config = BertConfig.from_pretrained(bert, num_labels=Num_labels)
@@ -862,7 +863,7 @@ def main():
     train_tensor = read_data(train_data, tokenizer, max_seq_length=Max_seq_length)
     test_tensor = read_data(test_data, tokenizer, max_seq_length=Max_seq_length)
 
-    # 训练模型
+    # # 训练模型
     # trained_model = model_train(model, train_tensor)
     # # 测试模型
     # model_eval(trained_model, test_tensor)
@@ -876,7 +877,8 @@ def main():
     # trained_model_path = './模型保存/ChineseBert_2023-03-29_16-27-07_0.949.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-03-25_17-10-39_0.95.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-04-05_16-30-38_0.9970.pt'
-    trained_model_path = './模型保存/ChineseBert_2023-04-07_20-12-29_0.999.pt'
+    # trained_model_path = './模型保存/ChineseBert_2023-04-07_20-12-29_0.999.pt'
+    trained_model_path = './模型保存/ChineseBert_2023-04-12_15-02-05__chinese-roberta-wwm-ext_0.999.pt'
     model = BertForSequenceClassification.from_pretrained(trained_model_path, config=config)
     model_eval(model, test_tensor)
     Text_predict(model, tokenizer)
@@ -888,7 +890,7 @@ def main():
 if __name__ == '__main__':
     # 设置训练超参数
     Batch_size = 12
-    Epochs = 5  # 4
+    Epochs = 2  # 4
     Learning_rate = 2e-5
     Num_labels = 2
     Max_seq_length = 256

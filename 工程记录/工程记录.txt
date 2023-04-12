@@ -1067,3 +1067,9 @@ print(generated_text)
 
 https://github.com/ymcui/Chinese-BERT-wwm
 该网址对比其他chinese模型的效果
+
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext-large
+git clone https://huggingface.co/hfl/chinese-roberta-wwm-ext
+git clone https://huggingface.co/hfl/chinese-bert-wwm-ext
+git clone https://huggingface.co/hfl/chinese-bert-wwm
+git clone https://huggingface.co/bert-base-chinese
