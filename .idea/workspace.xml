@@ -3,11 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="cd59329a-cfbe-415c-863c-8fb9136b2dc3" name="变更" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Text_Classification.py" beforeDir="false" afterPath="$PROJECT_DIR$/Text_Classification.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/test_data.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/test_data.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/train_data.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/train_data.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/my_chinesebert_config/config.json" beforeDir="false" afterPath="$PROJECT_DIR$/my_chinesebert_config/config.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/工程记录/工程记录.txt" beforeDir="false" afterPath="$PROJECT_DIR$/工程记录/工程记录.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +125,14 @@
       <option name="project" value="LOCAL" />
       <updated>1681278322606</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="训练并测试新模型">
+      <created>1681283327971</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1681283327971</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -171,6 +173,7 @@
     </ignored-roots>
     <MESSAGE value="修改项目信息" />
     <MESSAGE value="增加工程记录" />
-    <option name="LAST_COMMIT_MESSAGE" value="增加工程记录" />
+    <MESSAGE value="训练并测试新模型" />
+    <option name="LAST_COMMIT_MESSAGE" value="训练并测试新模型" />
   </component>
 </project>
