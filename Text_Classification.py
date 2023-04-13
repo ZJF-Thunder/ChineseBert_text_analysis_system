@@ -878,6 +878,7 @@ def main():
     # trained_model_path = './模型保存/ChineseBert_2023-03-25_17-10-39_0.95.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-04-05_16-30-38_0.9970.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-04-07_20-12-29_0.999.pt'
+
     trained_model_path = './模型保存/ChineseBert_2023-04-12_15-02-05__chinese-roberta-wwm-ext_0.999.pt'
     model = BertForSequenceClassification.from_pretrained(trained_model_path, config=config)
     model_eval(model, test_tensor)
