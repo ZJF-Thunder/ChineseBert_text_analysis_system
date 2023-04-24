@@ -33,9 +33,11 @@ def predict():
     labels = {0: "谣言", 1: "非谣言"}
     if predicted_label == 1:
         other_prob_label = 0
-        result = f"这条微博有{predicted_prob * 100:.2f}%的概率为{labels[predicted_label]}，有{other_prob * 100:.2f}%的概率为{labels[other_prob_label]}"
+        result = f"这条微博有{predicted_prob * 100:.2f}%的概率为{labels[predicted_label]}，" \
+                 f"有{other_prob * 100:.2f}%的概率为{labels[other_prob_label]}"
     else:
-        result = f"这条微博有{predicted_prob * 100:.2f}%的概率为{labels[predicted_label]}，有{other_prob * 100:.2f}%的概率为{labels[other_prob_label]}"
+        result = f"这条微博有{predicted_prob * 100:.2f}%的概率为{labels[predicted_label]}，" \
+                 f"有{other_prob * 100:.2f}%的概率为{labels[other_prob_label]}"
     return jsonify({'result': result})
 
 

@@ -79,12 +79,28 @@ def data_preprocessing(src_path, target_path):
     random.shuffle(all_data_list)
     # 返回随机打乱的数据列表
     all_data_path = "./data/all_data.txt"
+    all_rumor_path = "./data/rumor_data.txt"
+    all_non_rumor_path = "./data/non_rumor_data.txt"
     # 清空文本的数据，并往all_data_path的txt文本中写入所有文本数据
     with open(all_data_path, 'w') as f:
         f.seek(0)
         f.truncate()
     with open(all_data_path, 'a', encoding='utf-8') as f:
         for data in all_data_list:
+            f.write(data)
+    # 清空文本的数据，并往all_rumor_path的txt文本中写入所有谣言文本数据
+    with open(all_rumor_path, 'w') as f:
+        f.seek(0)
+        f.truncate()
+    with open(all_rumor_path, 'a', encoding='utf-8') as f:
+        for data in all_rumor_list:
+            f.write(data)
+    # 清空文本的数据，并往all_non_rumor_path的txt文本中写入所有非谣言文本数据
+    with open(all_non_rumor_path, 'w') as f:
+        f.seek(0)
+        f.truncate()
+    with open(all_non_rumor_path, 'a', encoding='utf-8') as f:
+        for data in all_non_rumor_list:
             f.write(data)
     print("数据文本生成成功！")
     logging.info("数据文本生成成功！")
@@ -259,7 +275,7 @@ def read_data(filename, tokenizer, max_seq_length=256):
     data = []
     for line in lines:
         label, text = line.strip().split('\t')
-        # 使用jieba进行高级别的精确分词
+        # 使用jieba进行高级别的精确分词，并去除停用词
         words = jieba.lcut(text, cut_all=False)
         text = ' '.join(words)  # 将分词结果用空格拼接
         # 这里面涉及到分词的操作其实是encod_plus调用了tokenizer.tokenize函数来进行分词
@@ -379,7 +395,6 @@ def model_train(model, train_tensor):
             # 调用自定义的二分类交叉熵损失函数计算损失,labels进行独热编码之后,本身就是浮点数,所以加不加float都一样
             # loss = criterion2(outputs.logits, labels.float())
             """
-
             # 反向传播
             loss.backward()
             # 参数更新
@@ -501,7 +516,7 @@ def show_animation(train_losses):
     # plt.show()  # 注释打开则播放训练损失动画
 
 
-# 定义计算指标函数
+# 定义性能指标函数
 def compute_metrics(y_true, y_pred):
     """功能：定义计算模型性能指标函数
 
@@ -877,9 +892,9 @@ def main():
     # trained_model_path = './模型保存/ChineseBert_2023-03-29_16-27-07_0.949.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-03-25_17-10-39_0.95.pt'
     # trained_model_path = './模型保存/ChineseBert_2023-04-05_16-30-38_0.9970.pt'
-    # trained_model_path = './模型保存/ChineseBert_2023-04-07_20-12-29_0.999.pt'
+    trained_model_path = './模型保存/ChineseBert_2023-04-07_20-12-29_0.999.pt'
 
-    trained_model_path = './模型保存/ChineseBert_2023-04-12_15-02-05__chinese-roberta-wwm-ext_0.999.pt'
+    # trained_model_path = './模型保存/ChineseBert_2023-04-12_15-02-05__chinese-roberta-wwm-ext_0.999.pt'
     model = BertForSequenceClassification.from_pretrained(trained_model_path, config=config)
     model_eval(model, test_tensor)
     Text_predict(model, tokenizer)
