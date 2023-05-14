@@ -35,7 +35,8 @@ def get_wordcloud(filepath):
             if word not in stop_words and word.strip():
                 tokens.append(word)
         text = ' '.join(tokens)  # 将分词结果用空格拼接
-        data.append((text))
+        print(text)
+        data.append(text)
 
     # 加载背景图片
     background_image = np.array(Image.open('./my_js/bg3.jpg'))

@@ -15,7 +15,7 @@ def generate_sentences(text, label, num_sentences=3):
     mask_token_index = (input_ids[0] == tokenizer.mask_token_id).nonzero().item()
     mask_token = tokenizer.decode(input_ids[0, mask_token_index]).replace(' ', '')
 
-    # 用 BERT 生成新的句子
+    # 用 ChineseBERT 生成新的句子
     with torch.no_grad():
         output = model(input_ids)
         prediction_scores = output[0]
@@ -31,7 +31,6 @@ def generate_sentences(text, label, num_sentences=3):
         print(new_sentence)
         print("——————————————————————————————————————————————————")
         sentences.append(label + "\t" + new_sentence + "\n")
-        # print(sentences)
     return sentences
 
 

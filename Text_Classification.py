@@ -281,17 +281,19 @@ def read_data(filename, tokenizer, max_seq_length=256):
         # 这里面涉及到分词的操作其实是encod_plus调用了tokenizer.tokenize函数来进行分词
         inputs = tokenizer.encode_plus(
             text,
-            add_special_tokens=True,
-            padding='max_length',
-            truncation=True,
-            max_length=max_seq_length,
-            return_tensors='pt',
+            add_special_tokens=True,  # 添加特殊标记[CLS]和[SEP]到序列
+            padding='max_length',  # 将序列填充到最大长度
+            truncation=True,  # 如果序列超过最大长度，则将其截断到最大长度
+            max_length=max_seq_length,  # 指定编码序列的最大长度
+            mask_type='word',  # 启用全词掩码策略
+            mask_prob=0.15,  # 指定遮盖比例为15%
+            return_tensors='pt',  # 返回PyTorch张量
             is_split_into_words=True)
         """"
         add_special_tokens = True将特殊标记如[CLS]和[SEP]添加到输入序列的开头和结尾。
         padding = 'max_length'  将序列填充到最大长度。
         truncation = True 如果序列超过最大长度，则将其截断到最大长度。
-        max_length = 32 指定编码序列的最大长度。
+        max_length = 256 指定编码序列的最大长度。
         return_attention_mask = True返回一个注意力掩码，指示哪些标记是填充标记。
         return_token_type_ids = True返回标记类型ID，指示哪些标记属于哪个段落（对于问答等任务很有用）。
         return_tensors = 'pt' 返回PyTorch张量而不是列表。
@@ -347,11 +349,11 @@ def model_train(model, train_tensor):
     # 定义二分类交叉损失函数
     # criterion2 = torch.nn.BCEWithLogitsLoss()
     """
-    # 增加学习率调整机制
+    # 增加学习率动态调整机制
     total_steps = len(train_loader) * Epochs
     scheduler = get_linear_schedule_with_warmup(optimizer,
-                                                num_warmup_steps=0,
-                                                num_training_steps=total_steps)
+                                                num_warmup_steps=0,  # 预热步数
+                                                num_training_steps=total_steps)  # 总的训练步数
     # 将模型移动到GPU设备
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.to(device)
@@ -380,6 +382,7 @@ def model_train(model, train_tensor):
             # 将模型的参数梯度清零，以免上一个epoch的梯度对当前epoch的训练产生影响
             optimizer.zero_grad()
             # 前向传播
+
             outputs = model(input_ids,
                             token_type_ids=token_type_ids,
                             attention_mask=attention_mask,
@@ -513,7 +516,7 @@ def show_animation(train_losses):
 
     ani = FuncAnimation(fig, animate, frames=len(train_losses), repeat=False)
     ani.event_source.add_callback(save_final_frame, train_losses=train_losses, fig=fig, ax=ax)
-    # plt.show()  # 注释打开则播放训练损失动画
+    plt.show()  # 注释打开则播放训练损失动画
 
 
 # 定义性能指标函数
@@ -649,7 +652,7 @@ def model_eval(model, test_tensor):
     precision, recall, thresholds = precision_recall_curve(label_true, label_pred)
     # 计算AUC-PR
     auc_PR = auc(recall, precision)
-    # 绘制PR曲线::纵轴是精度（precision），横轴是召回率（recall）
+    # 绘制PR曲线:纵轴是精度（precision），横轴是召回率（recall）
     plt.clf()  # 首先清空当前图像
     plt.plot(recall, precision, lw=2, color='blue', label='AUC-PR = %0.4f' % auc_PR)
     plt.xlim([0.0, 1.0])
@@ -836,12 +839,12 @@ def main():
     # 将数据集解压，并将json文件数据处理保存成txt文本  没有扩充之前的数据集
     # data_preprocessing(src_path, target_path)
     # 划分训练集和测试集
-    # train_data, test_data = splitting_dataset(all_data_path)
+    train_data, test_data = splitting_dataset(all_data_path, train_size=0.9)
 
     # 获取谣言和非谣言的数据条数
     get_rumor_norumor_num("./data/all_data3.txt")
     # 用扩充之后的数据集按照特定比例划分训练集和测试集，all_data2.txt为扩充之后的数据集
-    train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0.9)
+    # train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0.9)
 
     # # 可以舍弃
     # # 装载数据的根目录，负责存放数据txt文本
@@ -858,16 +861,18 @@ def main():
     # tokenizer = BertTokenizer('gdrive/My Drive/Colab Notebooks/vocab.txt')
 
     # 定义预训练模型
-    bert = './models/chinese-roberta-wwm-ext'
-    # bert = './models/chinese-bert-wwm-ext'
+    # bert = './models/chinese-roberta-wwm-ext'
+
     # bert = './models/bert-base-chinese'
     # 加载原始config文件
-    config = BertConfig.from_pretrained(bert, num_labels=Num_labels)
+
     """# 加载配置文件，可以在参数中修改配置文件
     # config = BertConfig.from_pretrained(bert, output_hidden_states=True, hidden_dropout_prob=0.2,
     # 也可以单独定义配置文件中的参数，以此来修改配置文件，然后保存
     # attention_probs_dropout_prob=0.2)
     # 如果修改了，就保存修改后的配置文件，如果没有修改参数则和原始参数相同"""
+    bert = './models/chinese-bert-wwm-ext'
+    config = BertConfig.from_pretrained(bert, num_labels=Num_labels)
     config.save_pretrained('my_chinesebert_config')
     # 用BertTokenizer来作为模型加载
     # 加载预训练的BERT模型和中文分词器，并返回一个BertTokenizer对象，可以用于对中文文本进行分词和编码
@@ -879,7 +884,7 @@ def main():
     test_tensor = read_data(test_data, tokenizer, max_seq_length=Max_seq_length)
 
     # # 训练模型
-    # trained_model = model_train(model, train_tensor)
+    trained_model = model_train(model, train_tensor)
     # # 测试模型
     # model_eval(trained_model, test_tensor)
     # # 预测函数
