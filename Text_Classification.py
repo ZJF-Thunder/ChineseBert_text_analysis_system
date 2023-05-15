@@ -164,101 +164,6 @@ def splitting_dataset(data_path, train_size=0.9):
     return train_data_path, test_data_path
 
 
-# WordPiece分词方法生成数据字典
-def create_dict(data_path, dict_path):
-    """
-    :param data_path: 样本数据路径
-    :param dict_path: 生成字典路径
-    :return: None
-    """
-    dict_set = set()
-    with open(data_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    for line in lines:
-        content = line.split('\t')[-1].replace('\n', '')
-        for s in content:
-            dict_set.add(s)
-    dict_list = []
-    i = 0
-    for s in dict_set:
-        dict_list.append([s, i])
-        i += 1
-    # 用列表推导式遍历dict_list列表中的含有字和字的序号的每一个子列表，获取key和value
-    # key为每个子列表的第一个元素，value为每个子列表的第二个元素
-    keys = [sublist[0] for sublist in dict_list]
-    values = [sublist[1] for sublist in dict_list]
-    dict_txt = dict(zip(keys, values))
-    # dict_txt = dict(dict_list)
-    end_dict = {"<unk>": i}
-    dict_txt.update(end_dict)
-    # 清空文本
-    with open(dict_path, 'w') as f:
-        f.seek(0)
-        f.truncate()
-    with open(dict_path, 'w', encoding='utf-8') as f:
-        f.write(str(dict_txt))
-    print("数据字典生成成功！")
-    logging.info("数据字典生成成功！")
-
-
-# 获取字典的长度
-def get_dict_len(dict_path):
-    """
-    :param dict_path: 字典的路径
-    :return: 字典长度
-    """
-    with open(dict_path, 'r', encoding='utf-8') as f:
-        line = eval(f.readlines()[0])
-    return len(line.keys())
-
-
-# 按8：1划分训练集和数据集,生成数据·对应的数据集txt向量化文本
-def create_data_list(data_list_path):
-    """
-    :param data_list_path: 样本数字化文本的指定生成路径
-    :return: 谣言和非谣言的数字化文本  文本向量化
-    """
-    with open(os.path.join(data_list_path, 'eval_list.txt'), 'w', encoding='utf-8') as f_eval:
-        f_eval.seek(0)
-        f_eval.truncate()
-
-    with open(os.path.join(data_list_path, 'train_list.txt'), 'w', encoding='utf-8') as f_train:
-        f_train.seek(0)
-        f_train.truncate()
-
-    with open(os.path.join(data_list_path, 'dict.txt'), 'r', encoding='utf-8') as f_data:
-        dict_txt = eval(f_data.readlines()[0])
-
-    with open(os.path.join(data_list_path, 'all_data.txt'), 'r', encoding='utf-8') as f_data:
-        lines = f_data.readlines()
-
-    i = 0
-    with open(os.path.join(data_list_path, 'eval_list.txt'), 'a', encoding='utf-8') as f_eval, \
-            open(os.path.join(data_list_path, 'train_list.txt'), 'a', encoding='utf-8') as f_train:
-        for line in lines:
-            words = line.split('\t')[-1].replace('\n', '')
-            label = line.split('\t')[0]
-            labs = ""
-            if i % 8 == 0:
-                for s in words:
-                    lab = str(dict_txt[s])
-                    labs = labs + lab + ','
-                labs = labs[:-1]
-                labs = labs + '\t' + label + '\n'
-                f_eval.write(labs)
-            else:
-                for s in words:
-                    lab = str(dict_txt[s])
-                    labs = labs + lab + ','
-                labs = labs[:-1]
-                labs = labs + '\t' + label + '\n'
-                f_train.write(labs)
-            i += 1
-
-    print("数据列表生成成功！")
-    logging.info("数据列表生成成功！")
-
-
 # 读取数据并将其转换为模型所需的格式
 def read_data(filename, tokenizer, max_seq_length=256):
     """功能：
@@ -839,41 +744,28 @@ def main():
     # 将数据集解压，并将json文件数据处理保存成txt文本  没有扩充之前的数据集
     # data_preprocessing(src_path, target_path)
     # 划分训练集和测试集
-    train_data, test_data = splitting_dataset(all_data_path, train_size=0.9)
+    # train_data, test_data = splitting_dataset(all_data_path, train_size=0.9)
 
     # 获取谣言和非谣言的数据条数
     get_rumor_norumor_num("./data/all_data3.txt")
     # 用扩充之后的数据集按照特定比例划分训练集和测试集，all_data2.txt为扩充之后的数据集
-    # train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0.9)
-
-    # # 可以舍弃
-    # # 装载数据的根目录，负责存放数据txt文本
-    # data_list_path = "./data/"
-    # # 创建数据字典
-    # dict_path = "./data/dict.txt"
-    # # create_dict(all_data_path, dict_path)
-    # # 划分训练集和测试集 抛弃
-    # # create_data_list(data_list_path)
-    # train_path = './data/train_list.txt'
-    # eval_path = './data/eval_list.txt'
+    train_data, test_data = splitting_dataset("./data/all_data3.txt", train_size=0.9)
 
     # 可以在这里指定字典的路径
     # tokenizer = BertTokenizer('gdrive/My Drive/Colab Notebooks/vocab.txt')
-
     # 定义预训练模型
     # bert = './models/chinese-roberta-wwm-ext'
-
     # bert = './models/bert-base-chinese'
+    bert = './models/chinese-bert-wwm-ext'
     # 加载原始config文件
-
+    config = BertConfig.from_pretrained(bert, num_labels=Num_labels)
+    config.save_pretrained('my_chinesebert_config')
     """# 加载配置文件，可以在参数中修改配置文件
     # config = BertConfig.from_pretrained(bert, output_hidden_states=True, hidden_dropout_prob=0.2,
     # 也可以单独定义配置文件中的参数，以此来修改配置文件，然后保存
     # attention_probs_dropout_prob=0.2)
     # 如果修改了，就保存修改后的配置文件，如果没有修改参数则和原始参数相同"""
-    bert = './models/chinese-bert-wwm-ext'
-    config = BertConfig.from_pretrained(bert, num_labels=Num_labels)
-    config.save_pretrained('my_chinesebert_config')
+
     # 用BertTokenizer来作为模型加载
     # 加载预训练的BERT模型和中文分词器，并返回一个BertTokenizer对象，可以用于对中文文本进行分词和编码
     tokenizer = BertTokenizer.from_pretrained(bert, num_classes=Num_labels)

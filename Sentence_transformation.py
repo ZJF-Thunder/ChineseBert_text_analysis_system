@@ -59,7 +59,7 @@ def augmented_data():
     # 为每个文本生成新的句子
     augmented_dataset = []
     # 读取文本文件中的数据，然后扩充数据，得到augmented_dataset列表
-    with open('./data/testdata/all_data.txt', 'r', encoding='utf-8') as f:
+    with open('./data/all_data.txt', 'r', encoding='utf-8') as f:
         for line in f:
             label, text = line.strip().split('\t')
             text = replace_with_mask(text)
@@ -72,7 +72,7 @@ def augmented_data():
 # 合并数据集
 def Merge_datasets(augmented_dataset):
     # 将扩充的文本写进文件
-    add_sentence_txt = './data/testdata/add_sentence.txt'
+    add_sentence_txt = './data/add_sentence.txt'
     with open(add_sentence_txt, 'w') as f:
         f.seek(0)
         f.truncate()
@@ -81,7 +81,7 @@ def Merge_datasets(augmented_dataset):
             f.write(data)
 
     # 读取未扩充前的数据到data2列表中
-    data_path = './data/testdata/all_data.txt'
+    data_path = './data/all_data.txt'
     with open(data_path, 'r', encoding='utf-8') as f:
         data2 = f.readlines()
     print(data2)
@@ -91,7 +91,7 @@ def Merge_datasets(augmented_dataset):
     # 将文本打乱顺序
     random.shuffle(all_data_list2)
     # 返回随机打乱的数据列表
-    all_data_path2 = "./data/testdata/all_data2.txt"
+    all_data_path2 = "./data/add_all_data2.txt"
     # 清空文本的数据，并往all_data_path的txt文本中写入所有文本数据
     with open(all_data_path2, 'w') as f:
         f.seek(0)
