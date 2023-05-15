@@ -11,7 +11,10 @@ __pycache__/
 /models/chinese-roberta-wwm-ext-large
 /.idea/
 #/模型保存/
-
+/代码备份/
+/代码库/
+/Test代码/
+/工程记录/
 
 
 # C extensions
